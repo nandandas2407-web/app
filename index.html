@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="description" content="Turn AI-generated plans into execution. The ultimate productivity dashboard.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Comeback">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Comeback Planner">
+  <meta name="msapplication-TileColor" content="#6366f1">
+  <meta name="msapplication-TileContent" content="assets/logo.svg">
+  <title>Comeback Planner</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/modal.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div id="app">
+    <nav id="navbar" class="navbar">
+      <div class="nav-container">
+        <a href="#" class="nav-logo" onclick="navigateTo('home')">
+          <img src="assets/logo.svg" alt="Comeback Planner" class="nav-logo-img">
+          <span class="nav-logo-text">Comeback</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+          <a href="#" class="nav-link active" data-page="home" onclick="navigateTo('home')">Home</a>
+          <a href="#" class="nav-link" data-page="dashboard" onclick="navigateTo('dashboard')">Dashboard</a>
+          <a href="#" class="nav-link" data-page="analytics" onclick="navigateTo('analytics')">Analytics</a>
+          <a href="#" class="nav-link" data-page="settings" onclick="navigateTo('settings')">Settings</a>
+        </div>
+        <div class="nav-actions">
+          <button class="nav-search-btn" onclick="openSearch()" aria-label="Search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <path d="m21 21-4.35-4.35"></path>
+            </svg>
+          </button>
+          <button class="nav-install-btn" id="installBtn" onclick="installPWA()" style="display:none;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Install App
+          </button>
+          <button class="nav-menu-btn" id="menuBtn" onclick="toggleMobileMenu()" aria-label="Menu">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main id="mainContent">
+      <section id="page-home" class="page active">
+        <div class="hero-section">
+          <div class="hero-bg">
+            <div class="hero-blob hero-blob-1"></div>
+            <div class="hero-blob hero-blob-2"></div>
+            <div class="hero-blob hero-blob-3"></div>
+          </div>
+          <div class="hero-container">
+            <div class="hero-content">
+              <div class="hero-badge">AI-Agnostic Productivity</div>
+              <h1 class="hero-title">
+                <span class="hero-title-line">COMEBACK</span>
+                <span class="hero-title-line hero-title-accent">PLANNER</span>
+              </h1>
+              <p class="hero-subtitle">Turn AI-generated plans into execution.</p>
+              <div class="hero-buttons">
+                <button class="btn btn-primary btn-lg" onclick="openModal('promptModal')">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                  </svg>
+                  Generate Prompt
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="openModal('importModal')">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  Import JSON
+                </button>
+                <button class="btn btn-ghost btn-lg" onclick="openDashboard()">
+                  Open Planner
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="hero-illustration">
+              <img src="assets/planner.svg" alt="Planner Dashboard" class="hero-image" id="heroImage">
+            </div>
+          </div>
+        </div>
+
+        <div class="recent-planner-section" id="recentSection" style="display:none;">
+          <div class="container">
+            <div class="section-header">
+              <h2 class="section-title">Your Recent Planner</h2>
+              <a href="#" class="section-link" onclick="openDashboard()">View Dashboard →</a>
+            </div>
+            <div class="recent-card" id="recentCard">
+              <div class="recent-card-content">
+                <h3 id="recentName">Student Planner</h3>
+                <p id="recentGoal">Goal: Score 95% in Board Exams</p>
+                <div class="recent-stats">
+                  <span class="recent-stat" id="recentTasks">0 Tasks</span>
+                  <span class="recent-stat" id="recentHabits">0 Habits</span>
+                  <span class="recent-stat" id="recentStreak">0 Day Streak</span>
+                </div>
+              </div>
+              <button class="btn btn-primary" onclick="openDashboard()">Open Dashboard</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="features-section">
+          <div class="container">
+            <div class="section-header">
+              <h2 class="section-title">Everything You Need</h2>
+              <p class="section-subtitle">A complete productivity system powered by any AI</p>
+            </div>
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Z"></path>
+                    <path d="M12 16v-4"></path>
+                    <path d="M12 8h.01"></path>
+                  </svg>
+                </div>
+                <h3>AI Compatible</h3>
+                <p>Works with ChatGPT, Claude, Gemini, DeepSeek, and any AI that outputs JSON</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                  </svg>
+                </div>
+                <h3>Offline Storage</h3>
+                <p>Your data lives on your device. No internet required after first load</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                  </svg>
+                </div>
+                <h3>Beautiful Dashboard</h3>
+                <p>Premium SaaS-quality interface with frosted glass and smooth animations</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <h3>Habit Tracking</h3>
+                <p>Build and track daily habits with animated progress rings</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <h3>Goal Tracking</h3>
+                <p>Set daily, weekly, and monthly goals with progress visualization</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="20" x2="18" y2="10"></line>
+                    <line x1="12" y1="20" x2="12" y2="4"></line>
+                    <line x1="6" y1="20" x2="6" y2="14"></line>
+                  </svg>
+                </div>
+                <h3>Analytics</h3>
+                <p>Track study hours, productivity scores, and progress with Canvas charts</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+                    <line x1="4" y1="22" x2="4" y2="15"></line>
+                  </svg>
+                </div>
+                <h3>PWA Installation</h3>
+                <p>Install as a native app on Android and iOS with offline support</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </div>
+                <h3>Export System</h3>
+                <p>Export your planner as JSON, create backups, or print your dashboard</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-it-works-section">
+          <div class="container">
+            <div class="section-header">
+              <h2 class="section-title">How It Works</h2>
+              <p class="section-subtitle">Four simple steps to your personalized planner</p>
+            </div>
+            <div class="steps-grid">
+              <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                  </svg>
+                </div>
+                <h3>Copy Prompt</h3>
+                <p>Generate and copy a specialized planner prompt from our collection</p>
+              </div>
+              <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <h3>Generate JSON</h3>
+                <p>Paste the prompt into any AI (ChatGPT, Claude, Gemini, etc.)</p>
+              </div>
+              <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                </div>
+                <h3>Import JSON</h3>
+                <p>Paste or upload the JSON response back into Comeback Planner</p>
+              </div>
+              <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <h3>Start Execution</h3>
+                <p>Your beautiful dashboard is ready. Track habits, goals, and tasks</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quick-actions-section">
+          <div class="container">
+            <div class="quick-actions-grid">
+              <button class="quick-action-card" onclick="openModal('promptModal')">
+                <img src="assets/favicon.svg" alt="Prompt" class="quick-action-icon">
+                <span class="quick-action-text">Generate Prompt</span>
+              </button>
+              <button class="quick-action-card" onclick="openModal('importModal')">
+                <img src="assets/import.svg" alt="Import" class="quick-action-icon">
+                <span class="quick-action-text">Import JSON</span>
+              </button>
+              <button class="quick-action-card" onclick="openModal('jsonGuideModal')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                </svg>
+                <span class="quick-action-text">JSON Guide</span>
+              </button>
+              <button class="quick-action-card" onclick="openDashboard()">
+                <img src="assets/dashboard.svg" alt="Dashboard" class="quick-action-icon">
+                <span class="quick-action-text">Dashboard</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <div class="footer-content">
+              <div class="footer-brand">
+                <img src="assets/logo.svg" alt="Comeback Planner" class="footer-logo">
+                <span class="footer-name">Comeback Planner</span>
+              </div>
+              <p class="footer-text">AI-Agnostic Productivity Dashboard. Built with vanilla HTML, CSS, and JavaScript.</p>
+              <div class="footer-links">
+                <button class="footer-link" onclick="openModal('jsonGuideModal')">JSON Guide</button>
+                <button class="footer-link" onclick="openModal('promptModal')">Generate Prompt</button>
+                <button class="footer-link" onclick="navigateTo('settings')">Settings</button>
+              </div>
+            </div>
+          </div>
+        </footer>
+      </section>
+
+      <section id="page-dashboard" class="page">
+        <div id="emptyState" class="empty-state">
+          <img src="assets/empty.svg" alt="No Planner Found" class="empty-illustration">
+          <h2 class="empty-title">No Planner Found</h2>
+          <p class="empty-subtitle">Create your personalized planner in 4 simple steps</p>
+          <div class="empty-steps">
+            <div class="empty-step">
+              <span class="empty-step-num">1</span>
+              <span class="empty-step-text">Copy Prompt</span>
+            </div>
+            <div class="empty-step">
+              <span class="empty-step-num">2</span>
+              <span class="empty-step-text">Generate JSON Using ChatGPT</span>
+            </div>
+            <div class="empty-step">
+              <span class="empty-step-num">3</span>
+              <span class="empty-step-text">Import JSON</span>
+            </div>
+            <div class="empty-step">
+              <span class="empty-step-num">4</span>
+              <span class="empty-step-text">Start Your Comeback</span>
+            </div>
+          </div>
+          <div class="empty-actions">
+            <button class="btn btn-primary btn-lg" onclick="openModal('promptModal')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              Copy Prompt
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="openModal('importModal')">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Import JSON
+            </button>
+          </div>
+        </div>
+
+        <div id="dashboardContent" class="dashboard-content" style="display:none;">
+          <div class="dashboard-header">
+            <div class="dashboard-header-left">
+              <h1 class="dashboard-title" id="dashTitle">Your Planner</h1>
+              <p class="dashboard-subtitle" id="dashSubtitle">Track your progress</p>
+            </div>
+            <div class="dashboard-header-actions">
+              <button class="btn btn-ghost" onclick="exportPlanner()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Export
+              </button>
+              <button class="btn btn-ghost" onclick="window.print()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print
+              </button>
+              <button class="btn btn-danger" onclick="confirmClearPlanner()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Clear
+              </button>
+            </div>
+          </div>
+
+          <div class="overview-section">
+            <div class="overview-grid">
+              <div class="overview-card">
+                <div class="overview-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Student</span>
+                  <span class="overview-value" id="ovName">-</span>
+                </div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-icon icon-goal">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="6"></circle>
+                    <circle cx="12" cy="12" r="2"></circle>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Goal</span>
+                  <span class="overview-value" id="ovGoal">-</span>
+                </div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-icon icon-exam">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Exam</span>
+                  <span class="overview-value" id="ovExam">-</span>
+                </div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-icon icon-hours">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Daily Hours</span>
+                  <span class="overview-value" id="ovHours">0h</span>
+                </div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-icon icon-streak">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Streak</span>
+                  <span class="overview-value" id="ovStreak">0 days</span>
+                </div>
+              </div>
+              <div class="overview-card">
+                <div class="overview-icon icon-completion">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                  </svg>
+                </div>
+                <div class="overview-info">
+                  <span class="overview-label">Completion</span>
+                  <span class="overview-value" id="ovCompletion">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashboard-tabs">
+            <button class="tab-btn active" data-tab="timeline" onclick="switchTab('timeline')">Timeline</button>
+            <button class="tab-btn" data-tab="weekly" onclick="switchTab('weekly')">Weekly</button>
+            <button class="tab-btn" data-tab="tasks" onclick="switchTab('tasks')">Tasks</button>
+            <button class="tab-btn" data-tab="habits" onclick="switchTab('habits')">Habits</button>
+            <button class="tab-btn" data-tab="goals" onclick="switchTab('goals')">Goals</button>
+          </div>
+
+          <div id="tabTimeline" class="tab-content active">
+            <div class="section-title-bar">
+              <h2>Daily Timeline</h2>
+            </div>
+            <div class="timeline" id="timelineContainer"></div>
+          </div>
+
+          <div id="tabWeekly" class="tab-content">
+            <div class="section-title-bar">
+              <h2>Weekly Planner</h2>
+            </div>
+            <div class="weekly-grid" id="weeklyContainer"></div>
+          </div>
+
+          <div id="tabTasks" class="tab-content">
+            <div class="section-title-bar">
+              <h2>Task Board</h2>
+              <button class="btn btn-sm btn-primary" onclick="openAddTaskModal()">+ Add Task</button>
+            </div>
+            <div class="kanban-board" id="kanbanContainer">
+              <div class="kanban-column" data-status="pending">
+                <div class="kanban-header">
+                  <span class="kanban-dot dot-pending"></span>
+                  <h3>Pending</h3>
+                  <span class="kanban-count" id="pendingCount">0</span>
+                </div>
+                <div class="kanban-cards" id="pendingCards" ondrop="dropTask(event, 'pending')" ondragover="allowDrop(event)"></div>
+              </div>
+              <div class="kanban-column" data-status="in-progress">
+                <div class="kanban-header">
+                  <span class="kanban-dot dot-progress"></span>
+                  <h3>In Progress</h3>
+                  <span class="kanban-count" id="progressCount">0</span>
+                </div>
+                <div class="kanban-cards" id="progressCards" ondrop="dropTask(event, 'in-progress')" ondragover="allowDrop(event)"></div>
+              </div>
+              <div class="kanban-column" data-status="completed">
+                <div class="kanban-header">
+                  <span class="kanban-dot dot-completed"></span>
+                  <h3>Completed</h3>
+                  <span class="kanban-count" id="completedCount">0</span>
+                </div>
+                <div class="kanban-cards" id="completedCards" ondrop="dropTask(event, 'completed')" ondragover="allowDrop(event)"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tabHabits" class="tab-content">
+            <div class="section-title-bar">
+              <h2>Habit Tracker</h2>
+              <button class="btn btn-sm btn-primary" onclick="openAddHabitModal()">+ Add Habit</button>
+            </div>
+            <div class="habits-grid" id="habitsContainer"></div>
+          </div>
+
+          <div id="tabGoals" class="tab-content">
+            <div class="section-title-bar">
+              <h2>Goal Tracker</h2>
+            </div>
+            <div class="goals-sections">
+              <div class="goals-group">
+                <h3 class="goals-group-title">Daily Goals</h3>
+                <div class="goals-list" id="dailyGoals"></div>
+              </div>
+              <div class="goals-group">
+                <h3 class="goals-group-title">Weekly Goals</h3>
+                <div class="goals-list" id="weeklyGoals"></div>
+              </div>
+              <div class="goals-group">
+                <h3 class="goals-group-title">Monthly Goals</h3>
+                <div class="goals-list" id="monthlyGoals"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-analytics" class="page">
+        <div class="analytics-header">
+          <h1 class="page-title">Analytics</h1>
+          <p class="page-subtitle">Track your productivity and progress</p>
+        </div>
+        <div id="analyticsEmpty" class="empty-state-mini">
+          <p>Import a planner to see analytics</p>
+          <button class="btn btn-primary" onclick="openModal('promptModal')">Get Started</button>
+        </div>
+        <div id="analyticsContent" class="analytics-content" style="display:none;">
+          <div class="analytics-grid">
+            <div class="analytics-card">
+              <h3>Study Hours</h3>
+              <canvas id="studyHoursChart" width="400" height="200"></canvas>
+            </div>
+            <div class="analytics-card">
+              <h3>Goal Completion</h3>
+              <canvas id="goalCompletionChart" width="400" height="200"></canvas>
+            </div>
+            <div class="analytics-card">
+              <h3>Productivity Score</h3>
+              <canvas id="productivityChart" width="400" height="200"></canvas>
+            </div>
+            <div class="analytics-card">
+              <h3>Habit Consistency</h3>
+              <canvas id="habitChart" width="400" height="200"></canvas>
+            </div>
+          </div>
+          <div class="analytics-summary">
+            <div class="summary-card">
+              <span class="summary-value" id="totalStudyHours">0</span>
+              <span class="summary-label">Total Study Hours</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-value" id="avgProductivity">0%</span>
+              <span class="summary-label">Avg Productivity</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-value" id="completedGoals">0</span>
+              <span class="summary-label">Goals Completed</span>
+            </div>
+            <div class="summary-card">
+              <span class="summary-value" id="activeHabits">0</span>
+              <span class="summary-label">Active Habits</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="page-settings" class="page">
+        <div class="settings-header">
+          <h1 class="page-title">Settings</h1>
+          <p class="page-subtitle">Manage your planner and app settings</p>
+        </div>
+        <div class="settings-content">
+          <div class="settings-group">
+            <h3 class="settings-group-title">Planner</h3>
+            <div class="settings-item" onclick="openModal('importModal')">
+              <div class="settings-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Import Planner</span>
+                <span class="settings-item-desc">Import a JSON planner file</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+            <div class="settings-item" onclick="exportPlanner()">
+              <div class="settings-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Export Planner</span>
+                <span class="settings-item-desc">Download your planner as JSON</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+            <div class="settings-item" onclick="exportBackup()">
+              <div class="settings-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                  <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                  <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Export Backup</span>
+                <span class="settings-item-desc">Download full backup with all data</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="settings-group-title">Data</h3>
+            <div class="settings-item" onclick="confirmClearPlanner()">
+              <div class="settings-item-icon icon-danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Clear Planner</span>
+                <span class="settings-item-desc">Remove current planner data</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+            <div class="settings-item" onclick="confirmClearAll()">
+              <div class="settings-item-icon icon-danger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Clear All Data</span>
+                <span class="settings-item-desc">Remove all app data from storage</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h3 class="settings-group-title">About</h3>
+            <div class="settings-item">
+              <div class="settings-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 16v-4"></path>
+                  <path d="M12 8h.01"></path>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">App Version</span>
+                <span class="settings-item-desc">v1.0.0</span>
+              </div>
+            </div>
+            <div class="settings-item">
+              <div class="settings-item-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Storage Usage</span>
+                <span class="settings-item-desc" id="storageUsage">Calculating...</span>
+              </div>
+            </div>
+            <div class="settings-item" id="installSettingItem" onclick="installPWA()" style="display:none;">
+              <div class="settings-item-icon icon-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </div>
+              <div class="settings-item-info">
+                <span class="settings-item-label">Install App</span>
+                <span class="settings-item-desc">Add to home screen</span>
+              </div>
+              <svg class="settings-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="mobile-nav" id="mobileNav">
+      <button class="mobile-nav-btn active" data-page="home" onclick="navigateTo('home')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Home</span>
+      </button>
+      <button class="mobile-nav-btn" data-page="dashboard" onclick="navigateTo('dashboard')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="3" y1="9" x2="21" y2="9"></line>
+          <line x1="9" y1="21" x2="9" y2="9"></line>
+        </svg>
+        <span>Planner</span>
+      </button>
+      <button class="mobile-nav-btn" data-page="analytics" onclick="navigateTo('analytics')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Analytics</span>
+      </button>
+      <button class="mobile-nav-btn" data-page="settings" onclick="navigateTo('settings')">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <div class="modal-overlay" id="modalOverlay" onclick="closeAllModals()"></div>
+
+    <div class="modal" id="promptModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Generate Planner Prompt</h2>
+        <button class="modal-close" onclick="closeModal('promptModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="prompt-selector">
+          <label class="prompt-label">Select Planner Type</label>
+          <div class="prompt-options" id="promptOptions">
+            <button class="prompt-option active" data-prompt="comeback" onclick="selectPrompt('comeback')">
+              <span class="prompt-option-icon">🎯</span>
+              <span class="prompt-option-text">Comeback Planner</span>
+            </button>
+            <button class="prompt-option" data-prompt="jee" onclick="selectPrompt('jee')">
+              <span class="prompt-option-icon">📚</span>
+              <span class="prompt-option-text">JEE Planner</span>
+            </button>
+            <button class="prompt-option" data-prompt="board" onclick="selectPrompt('board')">
+              <span class="prompt-option-icon">🏫</span>
+              <span class="prompt-option-text">Board Exam</span>
+            </button>
+            <button class="prompt-option" data-prompt="productivity" onclick="selectPrompt('productivity')">
+              <span class="prompt-option-icon">⚡</span>
+              <span class="prompt-option-text">Productivity</span>
+            </button>
+            <button class="prompt-option" data-prompt="custom" onclick="selectPrompt('custom')">
+              <span class="prompt-option-icon">✨</span>
+              <span class="prompt-option-text">Custom</span>
+            </button>
+          </div>
+        </div>
+        <div class="prompt-viewer">
+          <pre class="prompt-code" id="promptCode"></pre>
+        </div>
+        <div class="prompt-actions">
+          <button class="btn btn-primary" onclick="copyPrompt()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Prompt
+          </button>
+          <button class="btn btn-secondary" onclick="downloadPrompt()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download TXT
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="importModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Import Planner JSON</h2>
+        <button class="modal-close" onclick="closeModal('importModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="import-tabs">
+          <button class="import-tab active" onclick="switchImportTab('paste')">Paste JSON</button>
+          <button class="import-tab" onclick="switchImportTab('upload')">Upload File</button>
+          <button class="import-tab" onclick="switchImportTab('dragdrop')">Drag & Drop</button>
+        </div>
+
+        <div id="importPaste" class="import-panel active">
+          <textarea id="jsonInput" class="json-textarea" placeholder="Paste your AI-generated JSON here..." spellcheck="false"></textarea>
+        </div>
+
+        <div id="importUpload" class="import-panel">
+          <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p>Click to upload JSON file</p>
+            <span class="upload-hint">.json files only</span>
+            <input type="file" id="fileInput" accept=".json" onchange="handleFileUpload(event)" style="display:none;">
+          </div>
+        </div>
+
+        <div id="importDragdrop" class="import-panel">
+          <div class="upload-area" id="dropZone"
+               ondrop="handleDrop(event)"
+               ondragover="handleDragOver(event)"
+               ondragleave="handleDragLeave(event)">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p>Drag & drop your JSON file here</p>
+            <span class="upload-hint">Release to upload</span>
+          </div>
+        </div>
+
+        <div id="importStatus" class="import-status" style="display:none;"></div>
+
+        <div class="import-actions">
+          <button class="btn btn-primary btn-lg" onclick="importJSON()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            Import Planner
+          </button>
+          <button class="btn btn-ghost" onclick="openModal('jsonGuideModal')">View JSON Guide</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal-lg" id="jsonGuideModal">
+      <div class="modal-header">
+        <h2 class="modal-title">JSON Structure Guide</h2>
+        <button class="modal-close" onclick="closeModal('jsonGuideModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="guide-intro">
+          <p>Your AI must return a JSON object with the following structure. All fields are supported — missing fields will use defaults.</p>
+        </div>
+        <div class="guide-tabs">
+          <button class="guide-tab active" onclick="switchGuideTab('structure')">Structure</button>
+          <button class="guide-tab" onclick="switchGuideTab('example')">Example</button>
+          <button class="guide-tab" onclick="switchGuideTab('fields')">Field Reference</button>
+        </div>
+        <div id="guideStructure" class="guide-content active">
+          <pre class="guide-code" id="structureCode"></pre>
+        </div>
+        <div id="guideExample" class="guide-content">
+          <pre class="guide-code" id="exampleCode"></pre>
+        </div>
+        <div id="guideFields" class="guide-content">
+          <div class="field-reference" id="fieldReference"></div>
+        </div>
+        <div class="guide-actions">
+          <button class="btn btn-primary" onclick="copyTemplate()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Template
+          </button>
+          <button class="btn btn-secondary" onclick="downloadTemplate()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download Template
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addTaskModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Task</h2>
+        <button class="modal-close" onclick="closeModal('addTaskModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Task Title</label>
+          <input type="text" id="taskTitle" class="form-input" placeholder="Enter task title">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <input type="text" id="taskSubject" class="form-input" placeholder="Enter subject">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Priority</label>
+          <select id="taskPriority" class="form-input">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Due Date</label>
+          <input type="date" id="taskDue" class="form-input">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="saveNewTask()">Add Task</button>
+          <button class="btn btn-ghost" onclick="closeModal('addTaskModal')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="addHabitModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add New Habit</h2>
+        <button class="modal-close" onclick="closeModal('addHabitModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Habit Name</label>
+          <input type="text" id="habitName" class="form-input" placeholder="Enter habit name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select id="habitCategory" class="form-input">
+            <option value="study">Study</option>
+            <option value="revision">Revision</option>
+            <option value="exercise">Exercise</option>
+            <option value="reading">Reading</option>
+            <option value="health">Health</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target (days per week)</label>
+          <input type="number" id="habitTarget" class="form-input" value="7" min="1" max="7">
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="saveNewHabit()">Add Habit</button>
+          <button class="btn btn-ghost" onclick="closeModal('addHabitModal')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="searchModal">
+      <div class="modal-header">
+        <div class="search-input-wrapper">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="text" id="searchInput" class="search-input" placeholder="Search tasks, subjects, goals..." oninput="performSearch(this.value)">
+        </div>
+        <button class="modal-close" onclick="closeModal('searchModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="search-results" id="searchResults">
+          <div class="search-empty">Type to search...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <button class="floating-install-btn" id="floatingInstallBtn" onclick="installPWA()" style="display:none;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+      </svg>
+      Install App
+    </button>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/prompt-generator.js"></script>
+  <script src="js/importer.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

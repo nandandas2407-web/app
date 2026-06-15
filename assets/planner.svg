@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <linearGradient id="plannerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#a855f7"/>
+    </linearGradient>
+    <linearGradient id="plannerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#818cf8"/>
+      <stop offset="100%" style="stop-color:#c084fc"/>
+    </linearGradient>
+  </defs>
+  <rect x="60" y="40" width="280" height="220" rx="20" fill="white" stroke="#e2e8f0" stroke-width="2"/>
+  <rect x="60" y="40" width="280" height="50" rx="20" fill="url(#plannerGrad1)"/>
+  <rect x="60" y="70" width="280" height="20" fill="url(#plannerGrad1)"/>
+  <circle cx="90" cy="65" r="8" fill="white" opacity="0.3"/>
+  <circle cx="110" cy="65" r="8" fill="white" opacity="0.3"/>
+  <circle cx="130" cy="65" r="8" fill="white" opacity="0.3"/>
+  <rect x="80" y="110" width="120" height="8" rx="4" fill="#e2e8f0"/>
+  <rect x="80" y="110" width="80" height="8" rx="4" fill="url(#plannerGrad2)"/>
+  <rect x="80" y="130" width="240" height="6" rx="3" fill="#f1f5f9"/>
+  <rect x="80" y="146" width="200" height="6" rx="3" fill="#f1f5f9"/>
+  <rect x="80" y="162" width="220" height="6" rx="3" fill="#f1f5f9"/>
+  <rect x="80" y="190" width="100" height="30" rx="8" fill="url(#plannerGrad1)" opacity="0.9"/>
+  <rect x="190" y="190" width="100" height="30" rx="8" fill="#f1f5f9"/>
+  <circle cx="330" cy="80" r="40" fill="url(#plannerGrad1)" opacity="0.1"/>
+  <path d="M315 80 L325 90 L345 70" stroke="url(#plannerGrad1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>

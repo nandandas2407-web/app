@@ -1,0 +1,83 @@
+{
+  "name": "Comeback Planner",
+  "short_name": "Comeback",
+  "description": "Turn AI-generated plans into execution. The ultimate productivity dashboard.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["productivity", "education", "lifestyle"],
+  "icons": [
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/logo.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/planner.svg",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "Comeback Planner Dashboard"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Generate Prompt",
+      "short_name": "Prompt",
+      "description": "Generate a planner prompt for AI",
+      "url": "/?action=prompt",
+      "icons": [
+        {
+          "src": "assets/favicon.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Import JSON",
+      "short_name": "Import",
+      "description": "Import a planner JSON file",
+      "url": "/?action=import",
+      "icons": [
+        {
+          "src": "assets/import.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Open Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open your planner dashboard",
+      "url": "/?action=dashboard",
+      "icons": [
+        {
+          "src": "assets/dashboard.svg",
+          "sizes": "any",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}

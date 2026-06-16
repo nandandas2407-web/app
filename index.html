@@ -103,6 +103,13 @@
                     <polyline points="9 18 15 12 9 6"></polyline>
                   </svg>
                 </button>
+                <button class="btn btn-accent btn-lg" onclick="startManualSetup()">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3v18"></path>
+                    <path d="M3 12h18"></path>
+                  </svg>
+                  Manual Setup
+                </button>
               </div>
             </div>
             <div class="hero-illustration">
@@ -545,20 +552,57 @@
           <div id="tabGoals" class="tab-content">
             <div class="section-title-bar">
               <h2>Goal Tracker</h2>
+              <div class="goals-header-actions">
+                <div class="points-display">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                  <span id="totalPoints">0</span> / <span id="dailyTarget">50</span> daily
+                </div>
+              </div>
             </div>
+            <div id="goalsProgress" class="goals-progress-banner" style="display:none;"></div>
             <div class="goals-sections">
               <div class="goals-group">
-                <h3 class="goals-group-title">Daily Goals</h3>
+                <div class="goals-group-header">
+                  <h3 class="goals-group-title">
+                    <span class="goals-period-icon daily-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </span>
+                    Daily Goals
+                  </h3>
+                  <button class="btn btn-sm btn-primary" onclick="openAddGoalModal('daily')">+ Add</button>
+                </div>
                 <div class="goals-list" id="dailyGoals"></div>
               </div>
               <div class="goals-group">
-                <h3 class="goals-group-title">Weekly Goals</h3>
+                <div class="goals-group-header">
+                  <h3 class="goals-group-title">
+                    <span class="goals-period-icon weekly-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </span>
+                    Weekly Goals
+                  </h3>
+                  <button class="btn btn-sm btn-primary" onclick="openAddGoalModal('weekly')">+ Add</button>
+                </div>
                 <div class="goals-list" id="weeklyGoals"></div>
               </div>
               <div class="goals-group">
-                <h3 class="goals-group-title">Monthly Goals</h3>
+                <div class="goals-group-header">
+                  <h3 class="goals-group-title">
+                    <span class="goals-period-icon monthly-icon">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </span>
+                    Monthly Goals
+                  </h3>
+                  <button class="btn btn-sm btn-primary" onclick="openAddGoalModal('monthly')">+ Add</button>
+                </div>
                 <div class="goals-list" id="monthlyGoals"></div>
               </div>
+            </div>
+            <div class="goals-legend">
+              <span class="legend-item"><span class="legend-dot priority-high"></span> High Priority</span>
+              <span class="legend-item"><span class="legend-dot priority-medium"></span> Medium</span>
+              <span class="legend-item"><span class="legend-dot priority-low"></span> Low</span>
+              <span class="legend-item"><span class="legend-dot priority-completed"></span> Done</span>
             </div>
           </div>
         </div>
@@ -1057,6 +1101,153 @@
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
+
+    <div class="congrats-overlay" id="congratsOverlay" onclick="closeCongrats()"></div>
+    <div class="congrats-panel" id="congratsPanel">
+      <div class="confetti-container" id="confettiContainer"></div>
+      <div class="congrats-content">
+        <div class="congrats-icon">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path>
+          </svg>
+        </div>
+        <h2 class="congrats-title">Congratulations!</h2>
+        <p class="congrats-subtitle">You've completed all your daily goals for</p>
+        <div class="congrats-day">
+          <span class="congrats-day-label">Day</span>
+          <span class="congrats-day-number" id="congratsDayNumber">1</span>
+        </div>
+        <div class="congrats-stats">
+          <div class="congrats-stat">
+            <span class="congrats-stat-value" id="congratsPointsEarned">0</span>
+            <span class="congrats-stat-label">Points Earned</span>
+          </div>
+          <div class="congrats-stat">
+            <span class="congrats-stat-value" id="congratsGoalsCompleted">0</span>
+            <span class="congrats-stat-label">Goals Done</span>
+          </div>
+          <div class="congrats-stat">
+            <span class="congrats-stat-value" id="congratsStreak">1</span>
+            <span class="congrats-stat-label">Day Streak</span>
+          </div>
+        </div>
+        <p class="congrats-message">Keep the momentum going! You're on fire!</p>
+        <button class="btn btn-primary btn-lg congrats-btn" onclick="closeCongrats()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          Continue
+        </button>
+      </div>
+    </div>
+
+    <div class="modal" id="addGoalModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Add <span id="goalPeriodLabel">Daily</span> Goal</h2>
+        <button class="modal-close" onclick="closeModal('addGoalModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="goalPeriod" value="daily">
+        <div class="form-group">
+          <label class="form-label">Goal</label>
+          <input type="text" id="goalText" class="form-input" placeholder="What do you want to achieve?">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Priority</label>
+            <div class="priority-selector">
+              <button type="button" class="priority-btn priority-high-btn active" onclick="selectGoalPriority(this, 'high')">
+                <span class="priority-dot-high"></span> High
+              </button>
+              <button type="button" class="priority-btn priority-medium-btn" onclick="selectGoalPriority(this, 'medium')">
+                <span class="priority-dot-medium"></span> Medium
+              </button>
+              <button type="button" class="priority-btn priority-low-btn" onclick="selectGoalPriority(this, 'low')">
+                <span class="priority-dot-low"></span> Low
+              </button>
+            </div>
+            <input type="hidden" id="goalPriority" value="high">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Points</label>
+            <div class="points-selector">
+              <button type="button" class="points-btn" onclick="selectGoalPoints(this, 5)">5</button>
+              <button type="button" class="points-btn active" onclick="selectGoalPoints(this, 10)">10</button>
+              <button type="button" class="points-btn" onclick="selectGoalPoints(this, 15)">15</button>
+              <button type="button" class="points-btn" onclick="selectGoalPoints(this, 20)">20</button>
+              <button type="button" class="points-btn" onclick="selectGoalPoints(this, 50)">50</button>
+            </div>
+            <input type="hidden" id="goalPoints" value="10">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" onclick="saveNewGoal()">Add Goal</button>
+          <button class="btn btn-ghost" onclick="closeModal('addGoalModal')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal modal-lg" id="manualSetupModal">
+      <div class="modal-header">
+        <h2 class="modal-title">Manual Setup</h2>
+        <button class="modal-close" onclick="closeModal('manualSetupModal')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="manual-intro">Set up your planner manually without AI. Fill in your details below.</p>
+        <div class="form-group">
+          <label class="form-label">Your Name</label>
+          <input type="text" id="manualName" class="form-input" placeholder="Enter your name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your Goal</label>
+          <input type="text" id="manualGoal" class="form-input" placeholder="e.g., Score 95% in Board Exams">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Target Exam / Milestone</label>
+          <input type="text" id="manualExam" class="form-input" placeholder="e.g., CBSE Board 2026">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Target Date</label>
+            <input type="date" id="manualDate" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily Study Hours</label>
+            <input type="number" id="manualHours" class="form-input" value="8" min="1" max="16">
+          </div>
+        </div>
+        <div class="manual-goals-section">
+          <h3 class="manual-section-title">Add Your First Goals</h3>
+          <div class="form-group">
+            <label class="form-label">Daily Goal 1</label>
+            <input type="text" id="manualGoal1" class="form-input" placeholder="e.g., Study Physics for 2 hours">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily Goal 2</label>
+            <input type="text" id="manualGoal2" class="form-input" placeholder="e.g., Solve 20 math problems">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily Goal 3</label>
+            <input type="text" id="manualGoal3" class="form-input" placeholder="e.g., Revise Chemistry notes">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary btn-lg" onclick="saveManualSetup()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Create Planner
+          </button>
+          <button class="btn btn-ghost" onclick="closeModal('manualSetupModal')">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <button class="floating-install-btn" id="floatingInstallBtn" onclick="installPWA()" style="display:none;">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

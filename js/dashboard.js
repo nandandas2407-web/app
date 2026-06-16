@@ -1,7 +1,9 @@
 const Dashboard = {
   currentTab: 'timeline',
+  dayNumber: 1,
 
   init() {
+    this.dayNumber = (Storage.getProgress().dayNumber || 0) + 1;
     this.render();
   },
 
@@ -25,6 +27,7 @@ const Dashboard = {
     this.renderTasks();
     this.renderHabits();
     this.renderGoals(planner);
+    this.checkDailyCompletion(planner);
   },
 
   renderOverview(planner) {
@@ -91,7 +94,6 @@ const Dashboard = {
   renderWeekly(planner) {
     const container = document.getElementById('weeklyContainer');
     const weeklyPlan = planner.weekly_plan || {};
-
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     container.innerHTML = days.map(day => {
@@ -117,7 +119,6 @@ const Dashboard = {
 
   renderTasks() {
     const tasks = Storage.getTasks();
-    
     const pending = tasks.filter(t => t.status === 'pending');
     const inProgress = tasks.filter(t => t.status === 'in-progress');
     const completed = tasks.filter(t => t.status === 'completed');
@@ -193,35 +194,129 @@ const Dashboard = {
 
   renderGoals(planner) {
     const goals = planner.goals || {};
-    
-    this.renderGoalList('dailyGoals', goals.daily || []);
-    this.renderGoalList('weeklyGoals', goals.weekly || []);
-    this.renderGoalList('monthlyGoals', goals.monthly || []);
+    this.renderGoalList('dailyGoals', goals.daily || [], 'daily');
+    this.renderGoalList('weeklyGoals', goals.weekly || [], 'weekly');
+    this.renderGoalList('monthlyGoals', goals.monthly || [], 'monthly');
+    this.updatePointsDisplay(planner);
   },
 
-  renderGoalList(containerId, goals) {
+  renderGoalList(containerId, goals, period) {
     const container = document.getElementById(containerId);
     
     if (goals.length === 0) {
-      container.innerHTML = '<p style="color:var(--gray-400);font-size:13px;padding:8px 0;">No goals set</p>';
+      container.innerHTML = `
+        <div class="goals-empty-state">
+          <p>No ${period} goals set</p>
+          <button class="btn btn-sm btn-primary" onclick="openAddGoalModal('${period}')">+ Add Goal</button>
+        </div>
+      `;
       return;
     }
 
-    container.innerHTML = goals.map(goal => `
-      <div class="goal-item">
-        <div class="goal-check ${goal.completed ? 'checked' : ''}" onclick="toggleGoal(this, '${goal.id}')"></div>
-        <div class="goal-info">
-          <div class="goal-text ${goal.completed ? 'completed' : ''}">${goal.text || goal.title || 'Goal'}</div>
-          ${goal.progress !== undefined ? `
-            <div class="goal-progress-bar">
-              <div class="goal-progress-fill" style="width: ${goal.progress || 0}%"></div>
+    const sorted = [...goals].sort((a, b) => {
+      const order = { high: 0, medium: 1, low: 2 };
+      return (order[a.priority] || 2) - (order[b.priority] || 2);
+    });
+
+    container.innerHTML = sorted.map(goal => {
+      const priorityClass = goal.completed ? 'completed' : (goal.priority || 'medium');
+      return `
+        <div class="goal-item goal-priority-${priorityClass}" data-goal-id="${goal.id}">
+          <label class="goal-checkbox-wrapper">
+            <input type="checkbox" class="goal-checkbox" ${goal.completed ? 'checked' : ''} onchange="toggleGoal('${goal.id}', '${period}')">
+            <span class="goal-checkbox-custom"></span>
+          </label>
+          <div class="goal-info">
+            <div class="goal-text ${goal.completed ? 'completed' : ''}">${goal.text || goal.title || 'Goal'}</div>
+            <div class="goal-meta">
+              <span class="goal-priority-badge priority-${goal.priority || 'medium'}">${goal.priority || 'medium'}</span>
+              ${goal.points ? `<span class="goal-points">+${goal.points} pts</span>` : ''}
             </div>
-          ` : ''}
+          </div>
+          <button class="goal-delete-btn" onclick="deleteGoal('${goal.id}', '${period}')" title="Delete goal">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     this.observeElements(container.querySelectorAll('.goal-item'));
+  },
+
+  updatePointsDisplay(planner) {
+    const points = planner.points || {};
+    const totalEl = document.getElementById('totalPoints');
+    const targetEl = document.getElementById('dailyTarget');
+    if (totalEl) totalEl.textContent = points.totalEarned || 0;
+    if (targetEl) targetEl.textContent = points.dailyTarget || 50;
+  },
+
+  checkDailyCompletion(planner) {
+    const goals = (planner.goals || {}).daily || [];
+    if (goals.length === 0) return;
+
+    const allCompleted = goals.every(g => g.completed);
+    const completedCount = goals.filter(g => g.completed).length;
+    const progress = Storage.getProgress();
+    const dayNum = progress.dayNumber || 1;
+
+    const congratsPanel = document.getElementById('congratsPanel');
+    const congratsOverlay = document.getElementById('congratsOverlay');
+
+    if (allCompleted && !progress.congratsShownToday) {
+      const today = new Date().toISOString().split('T')[0];
+      if (progress.lastCongratsDate !== today) {
+        this.showCongratsPanel(dayNum, goals);
+        Storage.updateProgress({ congratsShownToday: true, lastCongratsDate: today });
+      }
+    } else if (completedCount > 0 && completedCount < goals.length) {
+      const progressEl = document.getElementById('goalsProgress');
+      if (progressEl) {
+        const pct = Math.round((completedCount / goals.length) * 100);
+        progressEl.style.display = 'block';
+        progressEl.innerHTML = `
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" style="width: ${pct}%"></div>
+          </div>
+          <span class="progress-text">${completedCount}/${goals.length} goals completed (${pct}%)</span>
+        `;
+      }
+    }
+  },
+
+  showCongratsPanel(dayNumber, goals) {
+    const totalPoints = goals.reduce((sum, g) => sum + (g.points || 0), 0);
+    const panel = document.getElementById('congratsPanel');
+    const overlay = document.getElementById('congratsOverlay');
+
+    document.getElementById('congratsDayNumber').textContent = dayNumber;
+    document.getElementById('congratsPointsEarned').textContent = totalPoints;
+    document.getElementById('congratsGoalsCompleted').textContent = goals.length;
+
+    const streak = Storage.getStreak();
+    document.getElementById('congratsStreak').textContent = streak.current || dayNumber;
+
+    const confettiContainer = document.getElementById('confettiContainer');
+    confettiContainer.innerHTML = '';
+    for (let i = 0; i < 50; i++) {
+      const confetti = document.createElement('div');
+      confetti.className = 'confetti-piece';
+      confetti.style.left = Math.random() * 100 + '%';
+      confetti.style.animationDelay = Math.random() * 2 + 's';
+      confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+      confetti.style.backgroundColor = ['#6366f1', '#a855f7', '#22c55e', '#f59e0b', '#ef4444', '#ec4899'][Math.floor(Math.random() * 6)];
+      confettiContainer.appendChild(confetti);
+    }
+
+    overlay.classList.add('active');
+    panel.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  },
+
+  closeCongratsPanel() {
+    document.getElementById('congratsPanel').classList.remove('active');
+    document.getElementById('congratsOverlay').classList.remove('active');
+    document.body.style.overflow = '';
   },
 
   observeElements(elements) {
@@ -240,10 +335,8 @@ const Dashboard = {
 
 function switchTab(tab) {
   Dashboard.currentTab = tab;
-  
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
   document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
-  
   document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
   document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
 }
@@ -251,9 +344,7 @@ function switchTab(tab) {
 function toggleWeeklyTask(el) {
   el.classList.toggle('checked');
   const text = el.nextElementSibling;
-  if (text) {
-    text.classList.toggle('completed');
-  }
+  if (text) text.classList.toggle('completed');
 }
 
 function dragTask(event, taskId) {
@@ -269,13 +360,11 @@ function dropTask(event, status) {
   event.preventDefault();
   const taskId = event.dataTransfer.getData('text/plain');
   if (taskId) {
-    Storage.updateTask(taskId, { status: status });
+    Storage.updateTask(taskId, { status });
     Dashboard.renderTasks();
     showToast('Task moved!', 'success');
   }
-  document.querySelectorAll('.kanban-card.dragging').forEach(card => {
-    card.classList.remove('dragging');
-  });
+  document.querySelectorAll('.kanban-card.dragging').forEach(card => card.classList.remove('dragging'));
 }
 
 function toggleHabit(habitId) {
@@ -283,25 +372,96 @@ function toggleHabit(habitId) {
   Dashboard.renderHabits();
 }
 
-function toggleGoal(el, goalId) {
-  el.classList.toggle('checked');
-  const textEl = el.nextElementSibling?.querySelector('.goal-text');
-  if (textEl) {
-    textEl.classList.toggle('completed');
-  }
-  
+function toggleGoal(goalId, period) {
   const planner = Storage.getPlanner();
-  if (planner && planner.goals) {
-    ['daily', 'weekly', 'monthly'].forEach(period => {
-      if (planner.goals[period]) {
-        const goal = planner.goals[period].find(g => g.id === goalId);
-        if (goal) {
-          goal.completed = !goal.completed;
-        }
-      }
-    });
-    Storage.setPlanner(planner);
+  if (!planner || !planner.goals || !planner.goals[period]) return;
+
+  const goal = planner.goals[period].find(g => g.id === goalId);
+  if (!goal) return;
+
+  goal.completed = !goal.completed;
+  
+  if (goal.completed && goal.points) {
+    if (!planner.points) planner.points = { totalEarned: 0, dailyTarget: 50, weeklyTarget: 200, monthlyTarget: 800 };
+    planner.points.totalEarned = (planner.points.totalEarned || 0) + goal.points;
+  } else if (!goal.completed && goal.points) {
+    if (planner.points) planner.points.totalEarned = Math.max(0, (planner.points.totalEarned || 0) - goal.points);
   }
+
+  Storage.setPlanner(planner);
+
+  const allGoals = [...(planner.goals.daily || []), ...(planner.goals.weekly || []), ...(planner.goals.monthly || [])];
+  const completedGoals = allGoals.filter(g => g.completed).length;
+  Storage.updateProgress({ completedGoals, totalGoals: allGoals.length });
+
+  Dashboard.renderGoals(planner);
+  Dashboard.renderOverview(planner);
+  Dashboard.checkDailyCompletion(planner);
+}
+
+function deleteGoal(goalId, period) {
+  const planner = Storage.getPlanner();
+  if (!planner || !planner.goals || !planner.goals[period]) return;
+
+  planner.goals[period] = planner.goals[period].filter(g => g.id !== goalId);
+  Storage.setPlanner(planner);
+
+  const allGoals = [...(planner.goals.daily || []), ...(planner.goals.weekly || []), ...(planner.goals.monthly || [])];
+  const completedGoals = allGoals.filter(g => g.completed).length;
+  Storage.updateProgress({ completedGoals, totalGoals: allGoals.length });
+
+  Dashboard.renderGoals(planner);
+  Dashboard.renderOverview(planner);
+  showToast('Goal deleted', 'info');
+}
+
+function openAddGoalModal(period) {
+  document.getElementById('goalPeriod').value = period;
+  document.getElementById('goalPeriodLabel').textContent = period.charAt(0).toUpperCase() + period.slice(1);
+  openModal('addGoalModal');
+}
+
+function saveNewGoal() {
+  const period = document.getElementById('goalPeriod').value;
+  const text = document.getElementById('goalText').value.trim();
+  const priority = document.getElementById('goalPriority').value;
+  const points = parseInt(document.getElementById('goalPoints').value) || 10;
+
+  if (!text) {
+    showToast('Please enter a goal', 'error');
+    return;
+  }
+
+  const planner = Storage.getPlanner();
+  if (!planner) {
+    showToast('Import a planner first', 'error');
+    return;
+  }
+
+  if (!planner.goals) planner.goals = { daily: [], weekly: [], monthly: [] };
+  if (!planner.goals[period]) planner.goals[period] = [];
+
+  const newGoal = {
+    id: `g${period[0]}_${Date.now()}`,
+    text,
+    priority,
+    completed: false,
+    points
+  };
+
+  planner.goals[period].push(newGoal);
+  Storage.setPlanner(planner);
+
+  const allGoals = [...(planner.goals.daily || []), ...(planner.goals.weekly || []), ...(planner.goals.monthly || [])];
+  Storage.updateProgress({ totalGoals: allGoals.length, completedGoals: allGoals.filter(g => g.completed).length });
+
+  document.getElementById('goalText').value = '';
+  document.getElementById('goalPriority').value = 'medium';
+  document.getElementById('goalPoints').value = '10';
+
+  closeModal('addGoalModal');
+  Dashboard.renderGoals(planner);
+  showToast('Goal added!', 'success');
 }
 
 function openAddTaskModal() {
@@ -319,13 +479,7 @@ function saveNewTask() {
     return;
   }
 
-  Storage.addTask({
-    title,
-    subject: subject || 'General',
-    priority,
-    dueDate,
-    status: 'pending'
-  });
+  Storage.addTask({ title, subject: subject || 'General', priority, dueDate, status: 'pending' });
 
   document.getElementById('taskTitle').value = '';
   document.getElementById('taskSubject').value = '';
@@ -351,11 +505,7 @@ function saveNewHabit() {
     return;
   }
 
-  Storage.addHabit({
-    name,
-    category,
-    target
-  });
+  Storage.addHabit({ name, category, target });
 
   document.getElementById('habitName').value = '';
   document.getElementById('habitCategory').value = 'study';
@@ -364,6 +514,10 @@ function saveNewHabit() {
   closeModal('addHabitModal');
   Dashboard.renderHabits();
   showToast('Habit added!', 'success');
+}
+
+function closeCongrats() {
+  Dashboard.closeCongratsPanel();
 }
 
 function renderDashboard() {

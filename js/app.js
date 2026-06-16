@@ -524,3 +524,125 @@ function setupIntersectionObserver() {
     observer.observe(el);
   });
 }
+
+function startManualSetup() {
+  openModal('manualSetupModal');
+}
+
+function saveManualSetup() {
+  const name = document.getElementById('manualName').value.trim();
+  const goal = document.getElementById('manualGoal').value.trim();
+  const exam = document.getElementById('manualExam').value.trim();
+  const date = document.getElementById('manualDate').value;
+  const hours = parseInt(document.getElementById('manualHours').value) || 8;
+  const goal1 = document.getElementById('manualGoal1').value.trim();
+  const goal2 = document.getElementById('manualGoal2').value.trim();
+  const goal3 = document.getElementById('manualGoal3').value.trim();
+
+  if (!name) {
+    showToast('Please enter your name', 'error');
+    return;
+  }
+
+  const planner = {
+    student: {
+      name: name || 'Student',
+      goal: goal || 'Achieve your goals',
+      exam: exam || 'Target Exam',
+      targetDate: date || new Date(Date.now() + 90 * 86400000).toISOString().split('T')[0],
+      dailyHours: hours,
+      weeklyHours: hours * 6
+    },
+    stats: { currentStreak: 0, totalStudyDays: 0, completionRate: 0 },
+    schedule: [
+      { time: '06:00 AM', task: 'Morning Routine', subject: 'Health', duration: '30 min', priority: 'medium' },
+      { time: '06:30 AM', task: 'Study Session 1', subject: 'General', duration: '2 hours', priority: 'high' },
+      { time: '08:30 AM', task: 'Breakfast & Break', subject: 'Health', duration: '30 min', priority: 'low' },
+      { time: '09:00 AM', task: 'Study Session 2', subject: 'General', duration: '2 hours', priority: 'high' },
+      { time: '11:00 AM', task: 'Short Break', subject: 'Health', duration: '15 min', priority: 'low' },
+      { time: '11:15 AM', task: 'Study Session 3', subject: 'General', duration: '1.5 hours', priority: 'high' },
+      { time: '12:45 PM', task: 'Lunch & Rest', subject: 'Health', duration: '1 hour', priority: 'medium' },
+      { time: '01:45 PM', task: 'Study Session 4', subject: 'General', duration: '2 hours', priority: 'high' },
+      { time: '03:45 PM', task: 'Break & Snack', subject: 'Health', duration: '15 min', priority: 'low' },
+      { time: '04:00 PM', task: 'Revision Session', subject: 'General', duration: '1.5 hours', priority: 'medium' },
+      { time: '05:30 PM', task: 'Exercise & Fresh Air', subject: 'Health', duration: '1 hour', priority: 'medium' },
+      { time: '06:30 PM', task: 'Light Study', subject: 'General', duration: '1 hour', priority: 'low' },
+      { time: '07:30 PM', task: 'Dinner', subject: 'Health', duration: '45 min', priority: 'medium' },
+      { time: '08:15 PM', task: 'Planning & Notes', subject: 'General', duration: '1 hour', priority: 'medium' },
+      { time: '09:15 PM', task: 'Wind Down', subject: 'Health', duration: '45 min', priority: 'low' }
+    ],
+    weekly_plan: {
+      Monday: [{ task: 'Study Subject 1', subject: 'General', duration: '3h', priority: 'high' }],
+      Tuesday: [{ task: 'Study Subject 2', subject: 'General', duration: '3h', priority: 'high' }],
+      Wednesday: [{ task: 'Study Subject 3', subject: 'General', duration: '3h', priority: 'high' }],
+      Thursday: [{ task: 'Revision & Practice', subject: 'General', duration: '3h', priority: 'high' }],
+      Friday: [{ task: 'Mock Test', subject: 'General', duration: '3h', priority: 'high' }],
+      Saturday: [{ task: 'Weak Topics', subject: 'General', duration: '3h', priority: 'medium' }],
+      Sunday: [{ task: 'Light Revision & Rest', subject: 'General', duration: '2h', priority: 'low' }]
+    },
+    tasks: [],
+    habits: [
+      { id: 'habit_1', name: 'Study ' + hours + ' hours', category: 'study', target: 7, completedDates: [] },
+      { id: 'habit_2', name: 'Exercise', category: 'exercise', target: 5, completedDates: [] },
+      { id: 'habit_3', name: 'Read', category: 'reading', target: 7, completedDates: [] }
+    ],
+    goals: {
+      daily: [
+        { id: 'gd_1', text: goal1 || 'Study for 2 hours', priority: 'high', completed: false, points: 15 },
+        { id: 'gd_2', text: goal2 || 'Solve practice problems', priority: 'high', completed: false, points: 15 },
+        { id: 'gd_3', text: goal3 || 'Revise today\'s notes', priority: 'medium', completed: false, points: 10 },
+        { id: 'gd_4', text: 'Drink 3L water', priority: 'low', completed: false, points: 5 },
+        { id: 'gd_5', text: 'Exercise 30 min', priority: 'medium', completed: false, points: 10 }
+      ],
+      weekly: [
+        { id: 'gw_1', text: 'Complete weekly target chapters', priority: 'high', completed: false, points: 50 },
+        { id: 'gw_2', text: 'Take 1 practice test', priority: 'medium', completed: false, points: 30 },
+        { id: 'gw_3', text: 'Review all notes', priority: 'low', completed: false, points: 20 }
+      ],
+      monthly: [
+        { id: 'gm_1', text: 'Finish 25% of syllabus', priority: 'high', completed: false, points: 100 },
+        { id: 'gm_2', text: 'Score 80%+ in mock tests', priority: 'high', completed: false, points: 80 },
+        { id: 'gm_3', text: 'Improve weak areas', priority: 'medium', completed: false, points: 60 }
+      ]
+    },
+    points: { totalEarned: 0, dailyTarget: 55, weeklyTarget: 200, monthlyTarget: 750 },
+    analytics: { studyHoursTarget: hours, productivityTarget: 80, weeklyGoalTarget: 5 },
+    healthReminders: ['Drink water regularly', 'Take breaks', 'Get enough sleep'],
+    breakBlocks: [{ time: '10:00 AM', duration: '15 min', activity: 'Short walk' }]
+  };
+
+  Storage.setPlanner(planner);
+  Storage.setTasks(planner.tasks);
+  Storage.setHabits(planner.habits);
+  Storage.updateProgress({
+    totalTasks: 0,
+    completedTasks: 0,
+    totalGoals: 8,
+    completedGoals: 0
+  });
+
+  document.getElementById('manualName').value = '';
+  document.getElementById('manualGoal').value = '';
+  document.getElementById('manualExam').value = '';
+  document.getElementById('manualDate').value = '';
+  document.getElementById('manualHours').value = '8';
+  document.getElementById('manualGoal1').value = '';
+  document.getElementById('manualGoal2').value = '';
+  document.getElementById('manualGoal3').value = '';
+
+  closeModal('manualSetupModal');
+  showToast('Planner created!', 'success');
+  navigateTo('dashboard');
+}
+
+function selectGoalPriority(btn, priority) {
+  document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('goalPriority').value = priority;
+}
+
+function selectGoalPoints(btn, points) {
+  document.querySelectorAll('.points-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('goalPoints').value = points;
+}

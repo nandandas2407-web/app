@@ -119,23 +119,35 @@ const Importer = {
     normalized.goals.daily = normalized.goals.daily.map((goal, index) => ({
       id: goal.id || `goal_d${index + 1}`,
       text: goal.text || goal.title || 'New Goal',
+      priority: goal.priority || 'medium',
       completed: goal.completed || false,
-      progress: goal.progress || 0
+      points: goal.points || 10
     }));
 
     normalized.goals.weekly = normalized.goals.weekly.map((goal, index) => ({
       id: goal.id || `goal_w${index + 1}`,
       text: goal.text || goal.title || 'New Goal',
+      priority: goal.priority || 'medium',
       completed: goal.completed || false,
-      progress: goal.progress || 0
+      points: goal.points || 20
     }));
 
     normalized.goals.monthly = normalized.goals.monthly.map((goal, index) => ({
       id: goal.id || `goal_m${index + 1}`,
       text: goal.text || goal.title || 'New Goal',
+      priority: goal.priority || 'medium',
       completed: goal.completed || false,
-      progress: goal.progress || 0
+      points: goal.points || 50
     }));
+
+    if (!normalized.points) {
+      normalized.points = {
+        totalEarned: 0,
+        dailyTarget: 50,
+        weeklyTarget: 200,
+        monthlyTarget: 800
+      };
+    }
 
     if (!normalized.analytics) {
       normalized.analytics = {
